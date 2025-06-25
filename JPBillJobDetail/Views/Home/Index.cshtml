@@ -5,7 +5,7 @@
 <div class="card mb-4">
     <div class="card-header">
         <a class="btn btn-link text-decoration-none" data-bs-toggle="collapse" href="#searchPanel" role="button" aria-expanded="false" aria-controls="searchPanel">
-            <i class="fa-solid fa-filter"></i> ตัวกรอง
+            <i class="fa-solid fa-filter"></i> ค้นหาบิล
         </a>
     </div>
     <div class="collapse show" id="searchPanel">
@@ -14,36 +14,37 @@
                 <div class="row">
                     <div class="col-md-3">
                         <div class="form-group">
-                            <label for="orderNo">Order No.</label>
-                            <select id="orderNo" name="orderNo" class="form-control">
-                                <option value="">-- เลือก Order No. --</option>
-                                <option value="ORD001">ORD001</option>
-                                <option value="ORD002">ORD002</option>
-                                <option value="ORD003">ORD003</option>
+                            <label for="ddlJobGroup">เลือกประเภทงาน</label>
+                            <select id="ddlJobGroup" name="ddlJobGroup" class="form-control">
+                                <option value="">-- เลือก ประเภทงาน --</option>
+                                @if (ViewBag.JobGroupList != null)
+                                {
+                                    foreach (var item in ViewBag.JobGroupList)
+                                    {
+                                        <option value="@item.JobNum">@item.JobName</option>
+                                    }
+                                }
                             </select>
                         </div>
                     </div>
                     <div class="col-md-3">
                         <div class="form-group">
-                            <label for="orderNo">Order No.</label>
-                            <select id="orderNo" name="orderNo" class="form-control">
-                                <option value="">-- เลือก Order No. --</option>
-                                <option value="ORD001">ORD001</option>
-                                <option value="ORD002">ORD002</option>
-                                <option value="ORD003">ORD003</option>
+                            <label for="ddlEmp">เลือกชื่อช่าง</label>
+                            <select id="ddlEmp" name="ddlEmp" class="form-control" disabled>
+                                <option value="">-- เลือก ช่าง --</option>
                             </select>
                         </div>
                     </div>
                     <div class="col-md-3">
                         <div class="form-group">
-                            <label for="revDate">วันที่รับ</label>
-                            <input id="revDate" name="revDate" type="date" class="form-control" value="@* @Model.Data.Filter?.RevDate?.ToString("yyyy-MM-dd") *@">
+                            <label for="revDate">วันที่เริ่ม</label>
+                                <input id="dtStart" name="dtStart" type="date" class="form-control" value="">
                         </div>
                     </div>
                     <div class="col-md-3">
                         <div class="form-group">
-                            <label for="revDate">วันที่รับ</label>
-                            <input id="revDate" name="revDate" type="date" class="form-control" value="@* @Model.Data.Filter?.RevDate?.ToString(" yyyy-MM-dd") *@">
+                            <label for="revDate">วันที่สิ้นสุด</label>
+                            <input id="dtEnd" name="dtEnd" type="date" class="form-control" value="">
                         </div>
                     </div>
                 </div>
@@ -52,11 +53,11 @@
                         <div class="form-group d-flex justify-content-end">
                             <label>&nbsp;</label>
                             <div class="btn-group d-block">
-                                <button type="submit" class="btn btn-primary">
-                                    <i class="fas fa-search"></i> ค้นหา
-                                </button>
                                 <button type="button" id="clearBtn" class="btn btn-secondary">
                                     <i class="fa-solid fa-xmark"></i> ล้าง
+                                </button>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-search"></i> ค้นหา
                                 </button>
                                 <button type="submit" class="btn btn-primary">
                                     <i class="fas fa-search"></i> print
@@ -69,3 +70,48 @@
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('#ddlJobGroup').on('change', function () {
+                getTempProfile();
+            });
+
+            $('#clearBtn').on('click', function () {
+                clearSearch();
+            });
+        });
+
+        function getTempProfile(){
+            let jobNum = $('#ddlJobGroup').val();
+            if (jobNum) {
+                $.ajax({
+                    url: '@Url.Action("TempProfile", "Home")',
+                    type: 'GET',
+                    data: { JobNum: jobNum },
+                    success: function (data) {
+                        var $ddlEmp = $('#ddlEmp');
+                        $ddlEmp.empty();
+                        $ddlEmp.append($('<option>', { value: '', text: '-- เลือก ช่าง --' }));
+                        $.each(data, function (i, item) {
+                            $ddlEmp.append($('<option>', { value: item.empCode, text: item.titleName + ' ' + item.name }));
+                        });
+                        $ddlEmp.prop('disabled', false);
+                    },
+                    error: function () {
+                        alert('เกิดข้อผิดพลาดในการดึงข้อมูลช่าง');
+                    }
+                });
+            } else {
+                $('#ddlEmp').empty().append($('<option>', { value: '', text: '-- เลือก ช่าง --' }));
+            }
+        }
+
+        function clearSearch() {
+            $('#searchForm')[0].reset();
+            $('#ddlEmp').empty().append($('<option>', { value: '', text: '-- เลือก ช่าง --' }));
+            $('#ddlEmp').prop('disabled', true);
+        }
+    </script>
+}

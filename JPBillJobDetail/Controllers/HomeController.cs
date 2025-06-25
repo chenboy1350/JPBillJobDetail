@@ -1,26 +1,42 @@
-using System.Diagnostics;
 using JPBillJobDetail.Models;
+using JPBillJobDetail.Service.Interface;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
+using System.Diagnostics;
 
 namespace JPBillJobDetail.Controllers
 {
-    public class HomeController : Controller
+    public class HomeController(IBillJobService billJobService, IDataMockUpService dataMockUp, IOptions<AppSettingModel> options) : Controller
     {
-        private readonly ILogger<HomeController> _logger;
-
-        public HomeController(ILogger<HomeController> logger)
-        {
-            _logger = logger;
-        }
+        private readonly IBillJobService _billJobService = billJobService;
+        private readonly IDataMockUpService _dataMockUp = dataMockUp;
+        private readonly AppSettingModel _appSettings = options.Value;
 
         public IActionResult Index()
         {
+            if (_appSettings.UseDemo)
+            {
+                ViewBag.JobGroupList = _dataMockUp.GetJobGroupList();
+            }
+            else
+            {
+                ViewBag.JobGroupList = _billJobService.GetJobGroupList();
+            }
+
             return View();
         }
 
-        public IActionResult Privacy()
+        [HttpGet]
+        public IActionResult TempProfile(int JobNum)
         {
-            return View();
+            if (_appSettings.UseDemo)
+            {
+                return Ok(_dataMockUp.GetTempProfileList());
+            }
+            else
+            {
+                return Ok(_billJobService.GetTempProfileList(JobNum));
+            }
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

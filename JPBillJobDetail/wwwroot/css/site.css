@@ -16,6 +16,20 @@
     box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
 }
 
+@font-face {
+    font-family: 'Kanit';
+    src: url('/fonts/Kanit/Kanit-Regular.ttf') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Kanit';
+    src: url('/fonts/Kanit/Kanit-Bold.ttf') format('woff2');
+    font-weight: 700;
+    font-style: normal;
+}
+
 html {
     position: relative;
     min-height: 100%;
@@ -23,6 +37,7 @@ html {
 
 body {
     margin-bottom: 60px;
+    font-family: 'Kanit', sans-serif;
 }
 
 .form-floating>.form-control-plaintext::placeholder,
