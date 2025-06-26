@@ -1,0 +1,85 @@
+﻿@model IEnumerable<BillJobDetailModel>
+
+<div class="table-container">
+    <table id="tblBillJob" class="table table-bordered table-striped table-hover">
+        <thead class="thead-dark">
+            <tr>
+                <th class="text-center">CustCode</th>
+                <th class="text-center">OrderNo</th>
+                <th class="text-center">ListNo.</th>
+                <th class="text-center">DocNo</th>
+                <th class="text-center">JobBarcode</th>
+                <th class="text-center">EmpCode</th>
+                <th class="text-center">EmpName</th>
+                <th class="text-center">JobName</th>
+                <th class="text-center">Article</th>
+                <th class="text-center">TDesArt</th>
+                <th class="text-center">Num</th>
+                <th class="text-center">OkTtl</th>
+                <th class="text-center">RtTtl</th>
+                <th class="text-center">DmTtl</th>
+                <th class="text-center">EpTtl</th>
+                <th class="text-center">IdNo1</th>
+                <th class="text-center">Remark1</th>
+                <th class="text-center">IdNo2</th>
+                <th class="text-center">Remark2</th>
+                <th class="text-center">IdNo3</th>
+                <th class="text-center">Remark3</th>
+                <th class="text-center">IdNo4</th>
+                <th class="text-center">Remark4</th>
+                <th class="text-center">IdNo5</th>
+                <th class="text-center">Remark5</th>
+                <th class="text-center">IdNo6</th>
+                <th class="text-center">Remark6</th>
+                <th class="text-center">MDate</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model != null && Model.Any())
+            {
+                foreach (var item in Model)
+                {
+                    <tr>
+                        <td class="text-center">@item.CustCode</td>
+                        <td class="text-center">@item.OrderNo</td>
+                        <td class="text-center">@item.ListNo</td>
+                        <td class="text-center">@item.DocNo</td>
+                        <td class="text-center">@item.JobBarcode</td>
+                        <td class="text-center">@item.EmpCode</td>
+                        <td class="text-center">@item.EmpName</td>
+                        <td class="text-center">@item.JobName</td>
+                        <td class="text-center">@item.Article</td>
+                        <td class="text-center">@item.TDesArt</td>
+                        <td class="text-center">@item.Num</td>
+                        <td class="text-center">@item.OkTtl.ToString("N2")</td>
+                        <td class="text-center">@item.RtTtl.ToString("N2")</td>
+                        <td class="text-center">@item.DmTtl.ToString("N2")</td>
+                        <td class="text-center">@item.EpTtl.ToString("N2")</td>
+                        <td class="text-center">@item.IdNo1</td>
+                        <td class="text-center">@item.Remark1</td>
+                        <td class="text-center">@item.IdNo2</td>
+                        <td class="text-center">@item.Remark2</td>
+                        <td class="text-center">@item.IdNo3</td>
+                        <td class="text-center">@item.Remark3</td>
+                        <td class="text-center">@item.IdNo4</td>
+                        <td class="text-center">@item.Remark4</td>
+                        <td class="text-center">@item.IdNo5</td>
+                        <td class="text-center">@item.Remark5</td>
+                        <td class="text-center">@item.IdNo6</td>
+                        <td class="text-center">@item.Remark6</td>
+                        <td class="text-center">@item.MDate.ToString("dd/MM/yyyy")</td>
+                    </tr>
+                    ;
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="28" class="text-center">
+                        <span>ไม่พบข้อมูล</span>
+                    </td>
+                </tr>                
+            }
+        </tbody>
+    </table>
+</div>

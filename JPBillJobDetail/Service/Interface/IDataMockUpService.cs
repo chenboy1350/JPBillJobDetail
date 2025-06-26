@@ -1,4 +1,6 @@
 ﻿using JPBillJobDetail.Data.Entities;
+using JPBillJobDetail.Models;
+using System.Collections.Generic;
 
 namespace JPBillJobDetail.Service.Interface
 {
@@ -6,5 +8,6 @@ namespace JPBillJobDetail.Service.Interface
     {
         IEnumerable<JobGroup> GetJobGroupList();
         IEnumerable<TempProfile> GetTempProfileList();
+        PagedListModel<BillJobDetailModel, BillJobFilterModel> GetMockBillJobDetails(BillJobFilterModel filter, int page, int pageSize);
     }
 }
