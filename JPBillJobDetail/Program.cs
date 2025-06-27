@@ -17,6 +17,7 @@ builder.Services.Configure<AppSettingModel>(builder.Configuration.GetSection("Ap
 
 builder.Services.AddScoped<IBillJobService, BillJobService>();
 builder.Services.AddScoped<IDataMockUpService, DataMockUpService>();
+builder.Services.AddScoped<IBillJobReportService, BillJobReportService>();
 
 var app = builder.Build();
 

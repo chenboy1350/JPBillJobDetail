@@ -44,12 +44,14 @@
         </div>
     </footer>
 
-    <!-- Loading Indicator -->
-    <div id="loadingIndicator" class="text-center" style="display: none;">
-        <div class="spinner-border" role="status">
-            <span class="sr-only"></span>
+    <!-- Loading Indicator with Backdrop -->
+    <div id="loadingIndicator" class="loading-backdrop" style="display: none;">
+        <div class="loading-content">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <div class="loading-text">กำลังดำเนินการ...</div>
         </div>
-        <p>กำลังโหลดรายการ...</p>
     </div>
 
     <!-- Success Modal -->

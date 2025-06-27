@@ -8,5 +8,6 @@ namespace JPBillJobDetail.Service.Interface
         IEnumerable<JobGroup> GetJobGroupList();
         IEnumerable<TempProfile> GetTempProfileList(int JobNum);
         Task<PagedListModel<BillJobDetailModel, BillJobFilterModel>> GetBillJobDetailListAsync(BillJobFilterModel filter, int page, int pageSize);
+        Task<IEnumerable<BillJobDetailModel>> GetAllBillJobDetailAsync(BillJobFilterModel filter);
     }
 }

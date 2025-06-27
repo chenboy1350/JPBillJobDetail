@@ -9,5 +9,6 @@ namespace JPBillJobDetail.Service.Interface
         IEnumerable<JobGroup> GetJobGroupList();
         IEnumerable<TempProfile> GetTempProfileList();
         PagedListModel<BillJobDetailModel, BillJobFilterModel> GetMockBillJobDetails(BillJobFilterModel filter, int page, int pageSize);
+        List<BillJobDetailModel> GetAllMockBillJobDetails();
     }
 }

@@ -20,13 +20,13 @@
                     <div class="col-md-3">
                         <div class="form-group">
                             <label for="ddlJobGroup">เลือกประเภทงาน</label>
-                            <select id="ddlJobGroup" name="ddlJobGroup" class="form-control">
+                            <select id="ddlJobGroup" name="ddlJobGroup" class="form-control" style="width: 100%">
                                 <option value="">-- เลือก ประเภทงาน --</option>
                                 @if (ViewBag.JobGroupList != null)
                                 {
                                     foreach (var item in ViewBag.JobGroupList)
                                     {
-                                        <option value="@item.JobNum">@item.JobName</option>
+                                        <option value='{"jobNum":"@item.JobNum","jobtype":"@item.Jobtype"}'>@item.JobName</option>
                                     }
                                 }
                             </select>
@@ -35,7 +35,7 @@
                     <div class="col-md-3">
                         <div class="form-group">
                             <label for="ddlEmp">เลือกชื่อช่าง</label>
-                            <select id="ddlEmp" name="ddlEmp" class="form-control" disabled>
+                            <select id="ddlEmp" name="ddlEmp" class="form-control" style="width: 100%" disabled>
                                 <option value="">-- เลือก ช่าง --</option>
                             </select>
                         </div>
@@ -64,10 +64,11 @@
                                 <button type="submit" class="btn btn-primary">
                                     <i class="fas fa-search"></i> ค้นหา
                                 </button>
-                                <button type="button" class="btn btn-success">
-                                    <i class="fa-solid fa-print"></i> print
-                                </button>
                             </div>
+                            <label>&nbsp;</label>
+                            <button type="button" id="btnDownloadExcel" class="btn btn-success">
+                                <i class="fa-solid fa-print"></i> print
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -89,12 +90,13 @@
     <script>
         let currentPage = @Html.Raw(currentPage);
         let currentPageSize = @Html.Raw(pageSize);
-                
-        const today = new Date();
-        const yyyy = today.getFullYear();
-        const mm = String(today.getMonth() + 1).padStart(2, '0');
-        const dd = String(today.getDate()).padStart(2, '0');
-        const formattedToday = `${yyyy}-${mm}-${dd}`;
+        let jobNum = 0;
+        let jobtype = 0;
+        let today = new Date();
+        let yyyy = today.getFullYear();
+        let mm = String(today.getMonth() + 1).padStart(2, '0');
+        let dd = String(today.getDate()).padStart(2, '0');
+        let formattedToday = `${yyyy}-${mm}-${dd}`;
 
         $(document).ready(function () {
             $('#dtStart').val(formattedToday);
@@ -102,10 +104,12 @@
 
             $('#ddlJobGroup').select2({
                 placeholder: "-- เลือก ประเภทงาน --",
+                width: '100%'
             });
 
             $('#ddlEmp').select2({
                 placeholder: "-- เลือก ช่าง --",
+                width: '100%'
             });
 
             $('#ddlJobGroup').on('change', function () {
@@ -128,38 +132,101 @@
 
             $(document).on('click', '.page-link[data-page]', function(e) {
                 e.preventDefault();
-                const page = $(this).data('page');
+                let page = $(this).data('page');
                 searchBillJob(page, currentPageSize);
+            });
+
+            $('#btnDownloadExcel').on('click', function () {
+                $('#loadingIndicator').show();
+
+                (async function () {
+
+                    let ddlVal = $('#ddlJobGroup').val();
+                    if (ddlVal) {
+                        let jobData = JSON.parse(ddlVal);
+                        jobNum = jobData.jobNum;
+                        jobtype = jobData.jobtype;
+                    }
+
+                    let empCode = $('#ddlEmp').val();
+                    let dtStart = $('#dtStart').val();
+                    let dtEnd = $('#dtEnd').val();
+
+                    const queryParams = [
+                        'JobNum=' + encodeURIComponent(jobNum),  
+                        'Jobtype=' + encodeURIComponent(jobtype),
+                        'EmpCode=' + encodeURIComponent(empCode),
+                        'DtStart=' + encodeURIComponent(dtStart),
+                        'DtEnd=' + encodeURIComponent(dtEnd)
+                    ].join('&');
+
+                    const url = '@Url.Action("BillJobReport", "Home")' + '?' + queryParams;
+
+                    try {
+                        const response = await fetch(url);
+                        if (!response.ok){
+                            showWarning('ไม่พบข้อมูล','คำเตือน');
+                            return;
+                        }
+
+                        const blob = await response.blob();
+                        const downloadUrl = window.URL.createObjectURL(blob);
+
+                        const a = document.createElement('a');
+                        a.href = downloadUrl;
+                        a.download = "BillJobReport.xlsx";
+                        document.body.appendChild(a);
+                        a.click();
+                        a.remove();
+
+                        window.URL.revokeObjectURL(downloadUrl);
+                    } catch (err) {
+                        showError(err.message, 'เกิดข้อผิดพลาด');
+                    } finally {
+                        $('#loadingIndicator').hide();
+                    }
+                })();
             });
         });
 
         function getTempProfile(){
-            let jobNum = $('#ddlJobGroup').val();
-            if (jobNum) {
-                $.ajax({
-                    url: '@Url.Action("TempProfile", "Home")',
-                    type: 'GET',
-                    data: { JobNum: jobNum },
-                    success: function (data) {
-                        var $ddlEmp = $('#ddlEmp');
-                        $ddlEmp.empty();
-                        $ddlEmp.append($('<option>', { value: '', text: '-- เลือก ช่าง --' }));
-                        $.each(data, function (i, item) {
-                            $ddlEmp.append($('<option>', { value: item.empCode, text: item.titleName + ' ' + item.name }));
-                        });
-                        $ddlEmp.prop('disabled', false);
-                    },
-                    error: function () {
-                        alert('เกิดข้อผิดพลาดในการดึงข้อมูลช่าง');
-                    }
-                });
-            } else {
-                $('#ddlEmp').empty().append($('<option>', { value: '', text: '-- เลือก ช่าง --' }));
+            let ddlVal = $('#ddlJobGroup').val();
+            if (ddlVal) {
+                let jobData = JSON.parse(ddlVal);
+                jobNum = jobData.jobNum;
+                jobtype = jobData.jobtype;
             }
+            else
+            {
+                return;
+            }
+
+            $.ajax({
+                url: '@Url.Action("TempProfile", "Home")',
+                type: 'GET',
+                data: { JobNum: jobNum },
+                success: function (data) {
+                    var $ddlEmp = $('#ddlEmp');
+                    $ddlEmp.empty();
+                    $ddlEmp.append($('<option>', { value: '', text: '-- เลือก ช่าง --' }));
+                    $.each(data, function (i, item) {
+                        $ddlEmp.append($('<option>', { value: item.empCode, text: '(' + item.empCode + ') ' + item.titleName + ' ' + item.name }));
+                    });
+                    $ddlEmp.prop('disabled', false);
+                },
+                error: function () {
+                    showError(err.message, 'เกิดข้อผิดพลาดในการดึงข้อมูลช่าง');
+                }
+            });
         }
 
         function searchBillJob(page, pageSize) {
-            let jobNum = $('#ddlJobGroup').val();
+            if ($('#ddlJobGroup').val()) {
+                let jobData = JSON.parse($('#ddlJobGroup').val());
+                jobNum = jobData.jobNum;
+                jobtype = jobData.jobtype;
+            }
+
             let empCode = $('#ddlEmp').val();
             let dtStart = $('#dtStart').val();
             let dtEnd = $('#dtEnd').val();
@@ -173,6 +240,7 @@
                 type: 'GET',
                 data: {
                     JobNum: jobNum,
+                    Jobtype: jobtype,
                     EmpCode: empCode,
                     DtStart: dtStart,
                     DtEnd: dtEnd,
@@ -189,7 +257,7 @@
                      }
                 },
                 error: function () {
-                     alert('เกิดข้อผิดพลาดในการค้นหาบิล');
+                     showError(err.message, 'เกิดข้อผิดพลาดในการค้นหาบิล');
                 },
                 complete: function() {
                      $('#loadingIndicator').hide();
@@ -198,6 +266,8 @@
         }
 
         function clearSearch() {
+            jobNum = 0;
+            jobtype = 0;
             $('#searchForm')[0].reset();
             $('#dtStart').val(formattedToday);
             $('#dtEnd').val(formattedToday);

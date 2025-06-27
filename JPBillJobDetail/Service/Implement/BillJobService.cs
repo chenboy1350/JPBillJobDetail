@@ -3,6 +3,7 @@ using JPBillJobDetail.Data.Entities;
 using JPBillJobDetail.Models;
 using JPBillJobDetail.Service.Interface;
 using Microsoft.EntityFrameworkCore;
+using System.Threading.Tasks;
 
 namespace JPBillJobDetail.Service.Implement
 {
@@ -19,6 +20,7 @@ namespace JPBillJobDetail.Service.Implement
                 {
                     JobNum = x.JobNum,
                     JobName = x.JobName,
+                    Jobtype = x.Jobtype,
                 });
 
                 _logger.Information("Fetched JobGroup list: {@JobGroups}", result.ToList());
@@ -104,11 +106,17 @@ namespace JPBillJobDetail.Service.Implement
             }
         }
 
-        private async Task<IEnumerable<BillJobDetailModel>> GetAllBillJobDetailAsync(BillJobFilterModel filter)
+        public async Task<IEnumerable<BillJobDetailModel>> GetAllBillJobDetailAsync(BillJobFilterModel filter)
         {
             try
             {
-                var query = (
+                bool hasJobNum = filter.JobNum != 0;
+                bool hasJobtype = filter.Jobtype != 0;
+                bool hasEmpCode = filter.EmpCode != 0;
+                bool hasDtStart = filter.DtStart.HasValue && filter.DtStart != DateTime.MinValue;
+                bool hasDtEnd = filter.DtEnd.HasValue && filter.DtEnd != DateTime.MinValue;
+
+                var query =
                     from a in _DbContext.JobDetail
                     join b in _DbContext.TempProfile on a.EmpCode equals b.EmpCode into bJoin
                     from b in bJoin.DefaultIfEmpty()
@@ -125,21 +133,15 @@ namespace JPBillJobDetail.Service.Implement
                     join f in _DbContext.JobMprint on new { e.JobBarcode, e.Num } equals new { f.JobBarcode, f.Num } into fJoin
                     from f in fJoin.DefaultIfEmpty()
 
-                    where c.JobType == 2 && c.BillCancel != true && e.Num != null
+                    where c.BillCancel != true && e.Num != null
 
                     orderby c.MDate, a.DocNo, a.JobBarcode, a.EmpCode
 
-                    select new { a, b, c, d, e, f }
-                );
+                    select new { a, b, c, d, e, f };
 
-                bool hasJobNum = filter.JobNum != 0;
-                bool hasEmpCode = filter.EmpCode != 0;
-                bool hasDtStart = filter.DtStart != null && filter.DtStart != DateTime.MinValue;
-                bool hasDtEnd = filter.DtEnd != null && filter.DtEnd != DateTime.MinValue;
-
-                if (hasJobNum)
+                if (hasJobNum && hasJobtype)
                 {
-                    query = query.Where(x => x.c.JobNum == filter.JobNum);
+                    query = query.Where(x => x.c.JobNum == filter.JobNum && x.c.JobType == filter.Jobtype);
                 }
 
                 if (hasEmpCode)
@@ -149,15 +151,15 @@ namespace JPBillJobDetail.Service.Implement
 
                 if (hasDtStart && hasDtEnd)
                 {
-                    query = query.Where(x => x.c.MDate >= filter.DtStart && x.c.MDate <= filter.DtEnd);
+                    query = query.Where(x => x.c.MDate.Date >= filter.DtStart!.Value.Date && x.c.MDate.Date <= filter.DtEnd!.Value.Date);
                 }
                 else if (hasDtStart)
                 {
-                    query = query.Where(x => x.c.MDate >= filter.DtStart);
+                    query = query.Where(x => x.c.MDate.Date >= filter.DtStart!.Value.Date);
                 }
                 else if (hasDtEnd)
                 {
-                    query = query.Where(x => x.c.MDate <= filter.DtEnd);
+                    query = query.Where(x => x.c.MDate.Date <= filter.DtEnd!.Value.Date);
                 }
 
                 var result = await query.Select(x => new BillJobDetailModel

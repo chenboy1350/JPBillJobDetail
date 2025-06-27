@@ -4,34 +4,34 @@
     <table id="tblBillJob" class="table table-bordered table-striped table-hover">
         <thead class="thead-dark">
             <tr>
-                <th class="text-center">CustCode</th>
-                <th class="text-center">OrderNo</th>
-                <th class="text-center">ListNo.</th>
-                <th class="text-center">DocNo</th>
-                <th class="text-center">JobBarcode</th>
-                <th class="text-center">EmpCode</th>
-                <th class="text-center">EmpName</th>
-                <th class="text-center">JobName</th>
-                <th class="text-center">Article</th>
-                <th class="text-center">TDesArt</th>
-                <th class="text-center">Num</th>
-                <th class="text-center">OkTtl</th>
-                <th class="text-center">RtTtl</th>
-                <th class="text-center">DmTtl</th>
-                <th class="text-center">EpTtl</th>
-                <th class="text-center">IdNo1</th>
-                <th class="text-center">Remark1</th>
-                <th class="text-center">IdNo2</th>
-                <th class="text-center">Remark2</th>
-                <th class="text-center">IdNo3</th>
-                <th class="text-center">Remark3</th>
-                <th class="text-center">IdNo4</th>
-                <th class="text-center">Remark4</th>
-                <th class="text-center">IdNo5</th>
-                <th class="text-center">Remark5</th>
-                <th class="text-center">IdNo6</th>
-                <th class="text-center">Remark6</th>
-                <th class="text-center">MDate</th>
+                <th class="text-center text-nowrap">ลูกค้า</th>
+                <th class="text-center text-nowrap">เลขที่ออเดอร์</th>
+                <th class="text-center text-nowrap">ลำดับที่.</th>
+                <th class="text-center text-nowrap">เลขที่เอกสาร</th>
+                <th class="text-center text-nowrap">เลขที่บิลจ่ายงาน</th>
+                <th class="text-center text-nowrap">รหัสช่าง</th>
+                <th class="text-center text-nowrap">ชื่อข่าง</th>
+                <th class="text-center text-nowrap">ประเภทงาน</th>
+                <th class="text-center text-nowrap">รหัสชิ้นงาน</th>
+                <th class="text-center text-nowrap">รายละเอียดชิ้นงาน</th>
+                <th class="text-center text-nowrap">ครั้งที่</th>
+                <th class="text-center text-nowrap">จำนวนใช้ได้</th>
+                <th class="text-center text-nowrap">จำนวนคืนร้าน</th>
+                <th class="text-center text-nowrap">จำนวนงานเสีย</th>
+                <th class="text-center text-nowrap">จำนวนคืนช่าง</th>
+                <th class="text-center text-nowrap">รหัสอาการที่ 1</th>
+                <th class="text-center text-nowrap">อาการที่ 1</th>
+                <th class="text-center text-nowrap">รหัสอาการที่ 2</th>
+                <th class="text-center text-nowrap">อาการที่ 2</th>
+                <th class="text-center text-nowrap">รหัสอาการที่ 3</th>
+                <th class="text-center text-nowrap">อาการที่ 3</th>
+                <th class="text-center text-nowrap">รหัสอาการที่ 4</th>
+                <th class="text-center text-nowrap">อาการที่ 4</th>
+                <th class="text-center text-nowrap">รหัสอาการที่ 5</th>
+                <th class="text-center text-nowrap">อาการที่ 5</th>
+                <th class="text-center text-nowrap">รหัสอาการที่ 6</th>
+                <th class="text-center text-nowrap">อาการที่ 6</th>
+                <th class="text-center text-nowrap">วันที่</th>
             </tr>
         </thead>
         <tbody>
@@ -40,34 +40,34 @@
                 foreach (var item in Model)
                 {
                     <tr>
-                        <td class="text-center">@item.CustCode</td>
-                        <td class="text-center">@item.OrderNo</td>
-                        <td class="text-center">@item.ListNo</td>
-                        <td class="text-center">@item.DocNo</td>
-                        <td class="text-center">@item.JobBarcode</td>
-                        <td class="text-center">@item.EmpCode</td>
-                        <td class="text-center">@item.EmpName</td>
-                        <td class="text-center">@item.JobName</td>
-                        <td class="text-center">@item.Article</td>
-                        <td class="text-center">@item.TDesArt</td>
-                        <td class="text-center">@item.Num</td>
-                        <td class="text-center">@item.OkTtl.ToString("N2")</td>
-                        <td class="text-center">@item.RtTtl.ToString("N2")</td>
-                        <td class="text-center">@item.DmTtl.ToString("N2")</td>
-                        <td class="text-center">@item.EpTtl.ToString("N2")</td>
-                        <td class="text-center">@item.IdNo1</td>
-                        <td class="text-center">@item.Remark1</td>
-                        <td class="text-center">@item.IdNo2</td>
-                        <td class="text-center">@item.Remark2</td>
-                        <td class="text-center">@item.IdNo3</td>
-                        <td class="text-center">@item.Remark3</td>
-                        <td class="text-center">@item.IdNo4</td>
-                        <td class="text-center">@item.Remark4</td>
-                        <td class="text-center">@item.IdNo5</td>
-                        <td class="text-center">@item.Remark5</td>
-                        <td class="text-center">@item.IdNo6</td>
-                        <td class="text-center">@item.Remark6</td>
-                        <td class="text-center">@item.MDate.ToString("dd/MM/yyyy")</td>
+                        <td class="text-center text-nowrap">@item.CustCode</td>
+                        <td class="text-center text-nowrap">@item.OrderNo</td>
+                        <td class="text-center text-nowrap">@item.ListNo</td>
+                        <td class="text-center text-nowrap">@item.DocNo</td>
+                        <td class="text-center text-nowrap">@item.JobBarcode</td>
+                        <td class="text-center text-nowrap">@item.EmpCode</td>
+                        <td class="text-right text-nowrap">@item.EmpName</td>
+                        <td class="text-center text-nowrap">@item.JobName</td>
+                        <td class="text-center text-nowrap">@item.Article</td>
+                        <td class="text-right text-nowrap">@item.TDesArt</td>
+                        <td class="text-center text-nowrap">@item.Num</td>
+                        <td class="text-center text-nowrap">@item.OkTtl.ToString("N2")</td>
+                        <td class="text-center text-nowrap">@item.RtTtl.ToString("N2")</td>
+                        <td class="text-center text-nowrap">@item.DmTtl.ToString("N2")</td>
+                        <td class="text-center text-nowrap">@item.EpTtl.ToString("N2")</td>
+                        <td class="text-center text-nowrap">@item.IdNo1</td>
+                        <td class="text-right text-nowrap">@item.Remark1</td>
+                        <td class="text-center text-nowrap">@item.IdNo2</td>
+                        <td class="text-right text-nowrap">@item.Remark2</td>
+                        <td class="text-center text-nowrap">@item.IdNo3</td>
+                        <td class="text-right text-nowrap">@item.Remark3</td>
+                        <td class="text-center text-nowrap">@item.IdNo4</td>
+                        <td class="text-right text-nowrap">@item.Remark4</td>
+                        <td class="text-center text-nowrap">@item.IdNo5</td>
+                        <td class="text-right text-nowrap">@item.Remark5</td>
+                        <td class="text-center text-nowrap">@item.IdNo6</td>
+                        <td class="text-right text-nowrap">@item.Remark6</td>
+                        <td class="text-center text-nowrap">@item.MDate.ToString("dd/MM/yyyy")</td>
                     </tr>
                     ;
                 }

@@ -66,6 +66,31 @@ namespace JPBillJobDetail.Service.Implement
 
         public PagedListModel<BillJobDetailModel, BillJobFilterModel> GetMockBillJobDetails(BillJobFilterModel filter, int page, int pageSize)
         {
+            var Data = GetAllMockBillJobDetails();
+
+            var totalCount = Data.Count();
+            var totalPages = (int)Math.Ceiling((double)totalCount / pageSize);
+            var skip = (page - 1) * pageSize;
+            var items = Data.Skip(skip).Take(pageSize).ToList();
+
+            Serilog.Log.Information("Fetching mock JobOrderDetails: {@JobOrderDetails}", items);
+
+            return new PagedListModel<BillJobDetailModel, BillJobFilterModel>
+            {
+                Data = new PaginationResult<BillJobDetailModel, BillJobFilterModel>
+                {
+                    Items = items,
+                    Filter = filter ?? new BillJobFilterModel(),
+                    CurrentPage = page,
+                    PageSize = pageSize,
+                    TotalCount = totalCount,
+                    TotalPages = totalPages,
+                }
+            };
+        }
+
+        public List<BillJobDetailModel> GetAllMockBillJobDetails()
+        {
             List<BillJobDetailModel> Data =
             [
                 new BillJobDetailModel
@@ -535,25 +560,9 @@ namespace JPBillJobDetail.Service.Implement
                 }
             ];
 
-            var totalCount = Data.Count();
-            var totalPages = (int)Math.Ceiling((double)totalCount / pageSize);
-            var skip = (page - 1) * pageSize;
-            var items = Data.Skip(skip).Take(pageSize).ToList();
+            _logger.Information("Fetching mock AllBillJobDetails: {@AllBillJobDetails}", Data);
 
-            Serilog.Log.Information("Fetching mock JobOrderDetails: {@JobOrderDetails}", items);
-
-            return new PagedListModel<BillJobDetailModel, BillJobFilterModel>
-            {
-                Data = new PaginationResult<BillJobDetailModel, BillJobFilterModel>
-                {
-                    Items = items,
-                    Filter = filter ?? new BillJobFilterModel(),
-                    CurrentPage = page,
-                    PageSize = pageSize,
-                    TotalCount = totalCount,
-                    TotalPages = totalPages,
-                }
-            };
+            return Data;
         }
     }
 }

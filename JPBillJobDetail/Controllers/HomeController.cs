@@ -4,13 +4,15 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Options;
 using System.Diagnostics;
+using System.Threading.Tasks;
 
 namespace JPBillJobDetail.Controllers
 {
-    public class HomeController(IBillJobService billJobService, IDataMockUpService dataMockUp, IOptions<AppSettingModel> options) : Controller
+    public class HomeController(IBillJobService billJobService, IDataMockUpService dataMockUp, IBillJobReportService billJobReportService, IOptions<AppSettingModel> options) : Controller
     {
         private readonly IBillJobService _billJobService = billJobService;
         private readonly IDataMockUpService _dataMockUp = dataMockUp;
+        private readonly IBillJobReportService _billJobReportService = billJobReportService;
         private readonly AppSettingModel _appSettings = options.Value;
 
         public IActionResult Index()
@@ -46,7 +48,7 @@ namespace JPBillJobDetail.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> BillJobDetail(int JobNum = 0, int EmpCode = 0, DateTime? DtStart = null, DateTime? DtEnd = null, int Page = 1, int PageSize = 10)
+        public async Task<IActionResult> BillJobDetail(int JobNum = 0,int Jobtype = 0, int EmpCode = 0, DateTime? DtStart = null, DateTime? DtEnd = null, int Page = 1, int PageSize = 10)
         {
             if (Page < 1) Page = 1;
             if (PageSize < 5) PageSize = 5;
@@ -55,6 +57,7 @@ namespace JPBillJobDetail.Controllers
             BillJobFilterModel filter = new()
             {
                 JobNum = JobNum,
+                Jobtype = Jobtype,
                 EmpCode = EmpCode,
                 DtStart = DtStart,
                 DtEnd = DtEnd
@@ -99,6 +102,37 @@ namespace JPBillJobDetail.Controllers
                     totalPages = model.Data.TotalPages,
                     PageSize
                 });
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> BillJobReport(int JobNum = 0, int Jobtype = 0, int EmpCode = 0, DateTime? DtStart = null, DateTime? DtEnd = null)
+        {
+            BillJobFilterModel filter = new()
+            {
+                JobNum = JobNum,
+                Jobtype = Jobtype,
+                EmpCode = EmpCode,
+                DtStart = DtStart,
+                DtEnd = DtEnd
+            };
+
+            if (_appSettings.UseDemo)
+            {
+                var data = _dataMockUp.GetAllMockBillJobDetails();
+                return File(_billJobReportService.GenBillJobReport(data), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "BillJobReport.xlsx");
+            }
+            else
+            {
+                var data = await _billJobService.GetAllBillJobDetailAsync(filter);
+                if (data != null && data.Any())
+                {
+                    return File(_billJobReportService.GenBillJobReport(data), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "BillJobReport.xlsx");
+                }
+                else
+                {
+                    return BadRequest();
+                }
             }
         }
 
