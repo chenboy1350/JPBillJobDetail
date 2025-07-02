@@ -160,4 +160,7 @@ public partial class Cprofile
     [StringLength(1)]
     [Unicode(false)]
     public string PendantType { get; set; } = null!;
+
+    [InverseProperty("ArticleNavigation")]
+    public virtual ICollection<CpriceSale> CpriceSale { get; set; } = new List<CpriceSale>();
 }

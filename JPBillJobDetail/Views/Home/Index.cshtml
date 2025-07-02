@@ -42,6 +42,23 @@
                     </div>
                     <div class="col-md-3">
                         <div class="form-group">
+                            <label for="ddlBillCondion">เลือกอาการ</label>
+                            <select id="ddlBillCondion" name="ddlBillCondion" class="form-control" style="width: 100%">
+                                <option value="">-- เลือก อาการ --</option>
+                                @if (ViewBag.JobBillConditionList != null)
+                                {
+                                    foreach (var item in ViewBag.JobBillConditionList)
+                                    {
+                                        <option value="@item.IdNo">(@item.IdNo) @item.Detail</option>
+                                    }
+                                }
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-md-3">
+                        <div class="form-group">
                             <label for="revDate">วันที่เริ่ม</label>
                                 <input id="dtStart" name="dtStart" type="date" class="form-control" value="">
                         </div>
@@ -66,8 +83,12 @@
                                 </button>
                             </div>
                             <label>&nbsp;</label>
+                            <button type="button" id="btnPrintPDF" class="btn btn-danger">
+                                <i class="fa-solid fa-file-pdf"></i> Print PDF
+                            </button>
+                            <label>&nbsp;</label>
                             <button type="button" id="btnDownloadExcel" class="btn btn-success">
-                                <i class="fa-solid fa-print"></i> print
+                                <i class="fa-solid fa-file-excel"></i> Export Excel
                             </button>
                         </div>
                     </div>
@@ -112,6 +133,11 @@
                 width: '100%'
             });
 
+            $('#ddlBillCondion').select2({
+                placeholder: "-- เลือก อาการ --",
+                width: '100%'
+            });
+
             $('#ddlJobGroup').on('change', function () {
                 getTempProfile();
             });
@@ -120,6 +146,8 @@
                 e.preventDefault();
                 searchBillJob(1, currentPageSize);
             });
+
+            $('#searchForm').trigger('submit');
 
             $('#clearBtn').on('click', function () {
                 clearSearch();
@@ -149,6 +177,7 @@
                     }
 
                     let empCode = $('#ddlEmp').val();
+                    let billCondion = $('#ddlBillCondion').val();
                     let dtStart = $('#dtStart').val();
                     let dtEnd = $('#dtEnd').val();
 
@@ -156,11 +185,12 @@
                         'JobNum=' + encodeURIComponent(jobNum),  
                         'Jobtype=' + encodeURIComponent(jobtype),
                         'EmpCode=' + encodeURIComponent(empCode),
+                        'BillCondion=' + encodeURIComponent(billCondion),
                         'DtStart=' + encodeURIComponent(dtStart),
                         'DtEnd=' + encodeURIComponent(dtEnd)
                     ].join('&');
 
-                    const url = '@Url.Action("BillJobReport", "Home")' + '?' + queryParams;
+                    const url = '@Url.Action("BillJobReportExcel", "Home")' + '?' + queryParams;
 
                     try {
                         const response = await fetch(url);
@@ -188,6 +218,52 @@
                 })();
             });
         });
+
+        $('#btnPrintPDF').on('click', function () {
+            $('#loadingIndicator').show();
+
+            (async function () {
+
+                let ddlVal = $('#ddlJobGroup').val();
+                if (ddlVal) {
+                    let jobData = JSON.parse(ddlVal);
+                    jobNum = jobData.jobNum;
+                    jobtype = jobData.jobtype;
+                }
+
+                let empCode = $('#ddlEmp').val();
+                let billCondion = $('#ddlBillCondion').val();
+                let dtStart = $('#dtStart').val();
+                let dtEnd = $('#dtEnd').val();
+
+                const queryParams = [
+                    'JobNum=' + encodeURIComponent(jobNum),  
+                    'Jobtype=' + encodeURIComponent(jobtype),
+                    'EmpCode=' + encodeURIComponent(empCode),
+                    'BillCondion=' + encodeURIComponent(billCondion),
+                    'DtStart=' + encodeURIComponent(dtStart),
+                    'DtEnd=' + encodeURIComponent(dtEnd)
+                ].join('&');
+
+                const url = '@Url.Action("BillJobReportPDF", "Home")' + '?' + queryParams;
+
+                try {
+                    const printWindow = window.open(url, '_blank');
+
+                    printWindow.onload = function() {
+                        // setTimeout(function() {
+                        //     printWindow.print();
+                        //     //printWindow.close();
+                        // }, 1000);
+                    };
+                } catch (err) {
+                    showError(err.message, 'เกิดข้อผิดพลาด');
+                } finally {
+                    $('#loadingIndicator').hide();
+                }
+            })();
+        });
+
 
         function getTempProfile(){
             let ddlVal = $('#ddlJobGroup').val();
@@ -228,6 +304,7 @@
             }
 
             let empCode = $('#ddlEmp').val();
+            let billCondion = $('#ddlBillCondion').val();
             let dtStart = $('#dtStart').val();
             let dtEnd = $('#dtEnd').val();
 
@@ -242,6 +319,7 @@
                     JobNum: jobNum,
                     Jobtype: jobtype,
                     EmpCode: empCode,
+                    BillCondion: billCondion,
                     DtStart: dtStart,
                     DtEnd: dtEnd,
                     Page: page,
@@ -272,6 +350,7 @@
             $('#dtStart').val(formattedToday);
             $('#dtEnd').val(formattedToday);
             $('#ddlJobGroup').val('0').trigger('change');
+            $('#ddlBillCondion').val('0').trigger('change');
             $('#ddlEmp').empty().append($('<option>', { value: '', text: '-- เลือก ช่าง --' })).prop('disabled', true);
             $('#tblBillJob tbody').empty().append(
                 $('<tr>').append(

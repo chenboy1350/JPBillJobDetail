@@ -12,9 +12,13 @@ public partial class JPDbContext : DbContext
     {
     }
 
+    public virtual DbSet<CpriceSale> CpriceSale { get; set; }
+
     public virtual DbSet<Cprofile> Cprofile { get; set; }
 
     public virtual DbSet<JobBill> JobBill { get; set; }
+
+    public virtual DbSet<JobBillCondition> JobBillCondition { get; set; }
 
     public virtual DbSet<JobDetail> JobDetail { get; set; }
 
@@ -28,6 +32,56 @@ public partial class JPDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<CpriceSale>(entity =>
+        {
+            entity.HasKey(e => e.Barcode)
+                .IsClustered(false)
+                .HasFillFactor(90);
+
+            entity.ToTable("CPriceSale", "dbo", tb => tb.HasTrigger("CpriceSale_Trigger"));
+
+            entity.HasIndex(e => e.Article, "CPriceSale4")
+                .IsClustered()
+                .HasFillFactor(90);
+
+            entity.HasIndex(e => e.Barcode, "IX_CPriceSale")
+                .IsUnique()
+                .HasFillFactor(90);
+
+            entity.HasIndex(e => new { e.EpoxyColor, e.FnCode }, "IX_CPriceSale_1").HasFillFactor(90);
+
+            entity.HasIndex(e => e.LinkBar, "IX_CPriceSale_2").HasFillFactor(90);
+
+            entity.Property(e => e.ArtCode).HasDefaultValue("");
+            entity.Property(e => e.ChkFinish).HasDefaultValue(1);
+            entity.Property(e => e.ComCode).HasDefaultValue("0");
+            entity.Property(e => e.ComputerName).HasDefaultValue("");
+            entity.Property(e => e.DisCode).HasDefaultValue("0");
+            entity.Property(e => e.EpoxyColor).HasDefaultValue("");
+            entity.Property(e => e.FactoryCode).HasDefaultValue("0");
+            entity.Property(e => e.FactorycodeOld).HasDefaultValue("");
+            entity.Property(e => e.FnCode).HasDefaultValue("");
+            entity.Property(e => e.FngemCode).HasDefaultValue("");
+            entity.Property(e => e.LinkBar).HasDefaultValue("");
+            entity.Property(e => e.ListGem).HasDefaultValue("");
+            entity.Property(e => e.ListMat).HasDefaultValue("");
+            entity.Property(e => e.Picture).HasDefaultValue("");
+            entity.Property(e => e.PictureC).HasDefaultValue("");
+            entity.Property(e => e.PictureL).HasDefaultValue("");
+            entity.Property(e => e.PictureM).HasDefaultValue("");
+            entity.Property(e => e.PictureR).HasDefaultValue("");
+            entity.Property(e => e.PictureS).HasDefaultValue("");
+            entity.Property(e => e.ProductType).HasDefaultValue(1);
+            entity.Property(e => e.Remark).HasDefaultValue("");
+            entity.Property(e => e.RingSize).HasDefaultValue("");
+            entity.Property(e => e.TdesFn).HasDefaultValue("");
+            entity.Property(e => e.UserName).HasDefaultValue("");
+
+            entity.HasOne(d => d.ArticleNavigation).WithMany(p => p.CpriceSale)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_CPriceSale_CProfile");
+        });
+
         modelBuilder.Entity<Cprofile>(entity =>
         {
             entity.HasKey(e => e.Article).HasFillFactor(90);
@@ -108,6 +162,18 @@ public partial class JPDbContext : DbContext
                 .HasForeignKey(d => new { d.JobBarcode, d.Barcode })
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_JobBill_JobDetail");
+        });
+
+        modelBuilder.Entity<JobBillCondition>(entity =>
+        {
+            entity.HasKey(e => e.IdNo)
+                .HasName("PK_JobCondiMast")
+                .HasFillFactor(90);
+
+            entity.Property(e => e.IdNo).HasDefaultValue("");
+            entity.Property(e => e.Detail).HasDefaultValue("");
+            entity.Property(e => e.Detail1).HasDefaultValue("");
+            entity.Property(e => e.MDate).HasDefaultValueSql("(getdate())");
         });
 
         modelBuilder.Entity<JobDetail>(entity =>

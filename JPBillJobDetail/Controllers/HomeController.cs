@@ -25,10 +25,12 @@ namespace JPBillJobDetail.Controllers
             if (_appSettings.UseDemo)
             {
                 ViewBag.JobGroupList = _dataMockUp.GetJobGroupList();
+                ViewBag.JobBillConditionList = _dataMockUp.GetJobBillConditionList();
             }
             else
             {
                 ViewBag.JobGroupList = _billJobService.GetJobGroupList();
+                ViewBag.JobBillConditionList = _billJobService.GetBillConditionList();
             }
 
             return View(new PagedListModel<BillJobDetailModel, BillJobFilterModel>());
@@ -48,7 +50,7 @@ namespace JPBillJobDetail.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> BillJobDetail(int JobNum = 0,int Jobtype = 0, int EmpCode = 0, DateTime? DtStart = null, DateTime? DtEnd = null, int Page = 1, int PageSize = 10)
+        public async Task<IActionResult> BillJobDetail(int JobNum = 0,int Jobtype = 0, int EmpCode = 0, string BillCondion = "", DateTime? DtStart = null, DateTime? DtEnd = null, int Page = 1, int PageSize = 10)
         {
             if (Page < 1) Page = 1;
             if (PageSize < 5) PageSize = 5;
@@ -59,6 +61,7 @@ namespace JPBillJobDetail.Controllers
                 JobNum = JobNum,
                 Jobtype = Jobtype,
                 EmpCode = EmpCode,
+                BillCondition = BillCondion,
                 DtStart = DtStart,
                 DtEnd = DtEnd
             };
@@ -106,13 +109,14 @@ namespace JPBillJobDetail.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> BillJobReport(int JobNum = 0, int Jobtype = 0, int EmpCode = 0, DateTime? DtStart = null, DateTime? DtEnd = null)
+        public async Task<IActionResult> BillJobReportExcel(int JobNum = 0, int Jobtype = 0, int EmpCode = 0, string BillCondion = "", DateTime? DtStart = null, DateTime? DtEnd = null)
         {
             BillJobFilterModel filter = new()
             {
                 JobNum = JobNum,
                 Jobtype = Jobtype,
                 EmpCode = EmpCode,
+                BillCondition = BillCondion,
                 DtStart = DtStart,
                 DtEnd = DtEnd
             };
@@ -120,14 +124,55 @@ namespace JPBillJobDetail.Controllers
             if (_appSettings.UseDemo)
             {
                 var data = _dataMockUp.GetAllMockBillJobDetails();
-                return File(_billJobReportService.GenBillJobReport(data), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "BillJobReport.xlsx");
+                return File(_billJobReportService.GenExcelBillJobReport(data), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "BillJobReport.xlsx");
             }
             else
             {
                 var data = await _billJobService.GetAllBillJobDetailAsync(filter);
                 if (data != null && data.Any())
                 {
-                    return File(_billJobReportService.GenBillJobReport(data), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "BillJobReport.xlsx");
+                    return File(_billJobReportService.GenExcelBillJobReport(data), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "BillJobReport.xlsx");
+                }
+                else
+                {
+                    return BadRequest();
+                }
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> BillJobReportPDF(int JobNum = 0, int Jobtype = 0, int EmpCode = 0, string BillCondion = "", DateTime? DtStart = null, DateTime? DtEnd = null)
+        {
+            BillJobFilterModel filter = new()
+            {
+                JobNum = JobNum,
+                Jobtype = Jobtype,
+                EmpCode = EmpCode,
+                BillCondition = BillCondion,
+                DtStart = DtStart,
+                DtEnd = DtEnd
+            };
+
+            if (_appSettings.UseDemo)
+            {
+                var data = _dataMockUp.GetAllMockBillJobDetails();
+
+                var pdfBytes = _billJobReportService.GenPDFBillJobReport(data);
+                var contentDisposition = $"inline; filename=BillJob_{DateTime.Now:yyyyMMdd}.pdf";
+                Response.Headers.Append("Content-Disposition", contentDisposition);
+
+                return File(pdfBytes, "application/pdf");
+            }
+            else
+            {
+                var data = await _billJobService.GetAllBillJobDetailAsync(filter);
+                if (data != null && data.Any())
+                {
+                    var pdfBytes = _billJobReportService.GenPDFBillJobReport(data);
+                    var contentDisposition = $"inline; filename=BillJob_{DateTime.Now:yyyyMMdd}.pdf";
+                    Response.Headers.Append("Content-Disposition", contentDisposition);
+
+                    return File(pdfBytes, "application/pdf");
                 }
                 else
                 {

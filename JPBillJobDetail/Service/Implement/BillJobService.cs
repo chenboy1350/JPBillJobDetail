@@ -34,6 +34,27 @@ namespace JPBillJobDetail.Service.Implement
             }
         }
 
+        public IEnumerable<JobBillCondition> GetBillConditionList()
+        {
+            try
+            {
+                var result = _DbContext.JobBillCondition.Select(x => new JobBillCondition
+                {
+                    IdNo = x.IdNo,
+                    Detail = x.Detail,
+                });
+
+                _logger.Information("Fetched BillCondition list: {@BillCondition}", result.ToList());
+
+                return [.. result];
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex, "Error fetching BillCondition list");
+                return [];
+            }
+        }
+
         public IEnumerable<TempProfile> GetTempProfileList(int JobNum)
         {
             IEnumerable<TempProfile> result = [];
@@ -113,6 +134,7 @@ namespace JPBillJobDetail.Service.Implement
                 bool hasJobNum = filter.JobNum != 0;
                 bool hasJobtype = filter.Jobtype != 0;
                 bool hasEmpCode = filter.EmpCode != 0;
+                bool hasBillCondition = !string.IsNullOrEmpty(filter.BillCondition);
                 bool hasDtStart = filter.DtStart.HasValue && filter.DtStart != DateTime.MinValue;
                 bool hasDtEnd = filter.DtEnd.HasValue && filter.DtEnd != DateTime.MinValue;
 
@@ -149,6 +171,17 @@ namespace JPBillJobDetail.Service.Implement
                     query = query.Where(x => x.a.EmpCode == filter.EmpCode);
                 }
 
+                if (hasBillCondition)
+                {
+                    query = query.Where(x =>
+                        x.f.IdNo1 == filter.BillCondition ||
+                        x.f.IdNo2 == filter.BillCondition ||
+                        x.f.IdNo3 == filter.BillCondition ||
+                        x.f.IdNo4 == filter.BillCondition ||
+                        x.f.IdNo5 == filter.BillCondition ||
+                        x.f.IdNo6 == filter.BillCondition );
+                }
+
                 if (hasDtStart && hasDtEnd)
                 {
                     query = query.Where(x => x.c.MDate.Date >= filter.DtStart!.Value.Date && x.c.MDate.Date <= filter.DtEnd!.Value.Date);
@@ -164,33 +197,33 @@ namespace JPBillJobDetail.Service.Implement
 
                 var result = await query.Select(x => new BillJobDetailModel
                 {
-                    CustCode = x.a.CustCode,
-                    OrderNo = x.a.OrderNo,
-                    ListNo = x.a.ListNo,
-                    DocNo = x.a.DocNo,
-                    JobBarcode = x.a.JobBarcode,
+                    CustCode = x.a.CustCode.Trim(),
+                    OrderNo = x.a.OrderNo.Trim(),
+                    ListNo = x.a.ListNo.Trim(),
+                    DocNo = x.a.DocNo.Trim(),
+                    JobBarcode = x.a.JobBarcode.Trim(),
                     EmpCode = x.a.EmpCode,
-                    EmpName = x.c.EmpName,
-                    JobName = x.c.JobName,
-                    Article = x.a.Article,
-                    TDesArt = x.d.TdesArt,
-                    Num = x.e.Num,
+                    EmpName = x.c.EmpName.Trim(),
+                    JobName = x.c.JobName.Trim(),
+                    Article = x.a.Article.Trim(),
+                    TDesArt = x.d.TdesArt.Trim(),
+                    Num = x.e.Num.Trim(),
                     OkTtl = x.e.OkTtl,
                     RtTtl = x.e.RtTtl,
                     DmTtl = x.e.DmTtl,
                     EpTtl = x.e.EpTtl,
-                    IdNo1 = x.f.IdNo1,
-                    Remark1 = x.f.Remark1,
-                    IdNo2 = x.f.IdNo2,
-                    Remark2 = x.f.Remark2,
-                    IdNo3 = x.f.IdNo3,
-                    Remark3 = x.f.Remark3,
-                    IdNo4 = x.f.IdNo4,
-                    Remark4 = x.f.Remark4,
-                    IdNo5 = x.f.IdNo5,
-                    Remark5 = x.f.Remark5,
-                    IdNo6 = x.f.IdNo6,
-                    Remark6 = x.f.Remark6,
+                    IdNo1 = x.f.IdNo1.Trim(),
+                    Remark1 = x.f.Remark1.Trim(),
+                    IdNo2 = x.f.IdNo2.Trim(),
+                    Remark2 = x.f.Remark2.Trim(),
+                    IdNo3 = x.f.IdNo3.Trim(),
+                    Remark3 = x.f.Remark3.Trim(),
+                    IdNo4 = x.f.IdNo4.Trim(),
+                    Remark4 = x.f.Remark4.Trim(),
+                    IdNo5 = x.f.IdNo5.Trim(),
+                    Remark5 = x.f.Remark5.Trim(),
+                    IdNo6 = x.f.IdNo6.Trim(),
+                    Remark6 = x.f.Remark6.Trim(),
                     MDate = x.c.MDate
                 }).ToListAsync();
 

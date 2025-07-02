@@ -1,7 +1,6 @@
 ﻿using JPBillJobDetail.Data.Entities;
 using JPBillJobDetail.Models;
 using JPBillJobDetail.Service.Interface;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace JPBillJobDetail.Service.Implement
 {
@@ -34,10 +33,40 @@ namespace JPBillJobDetail.Service.Implement
 
             return Data;
         }
+        public IEnumerable<JobBillCondition> GetJobBillConditionList()
+        {
+            List<JobBillCondition> Data =
+            [
+                new JobBillCondition
+                {
+                    IdNo = "001",
+                    Detail = "ชำระเงินภายใน 30 วันหลังจากออกใบแจ้งหนี้",
+                    MDate = new DateTime(2025, 6, 1),
+                    Detail1 = "การชำระเงินแบบโอนผ่านธนาคาร"
+                },
+                new JobBillCondition
+                {
+                    IdNo = "002",
+                    Detail = "มีส่วนลด 5% หากชำระภายใน 7 วัน",
+                    MDate = new DateTime(2025, 6, 15),
+                    Detail1 = "เงื่อนไขส่งเสริมการขาย"
+                },
+                new JobBillCondition
+                {
+                    IdNo = "003",
+                    Detail = "เงื่อนไขพิเศษสำหรับลูกค้าประจำ",
+                    MDate = new DateTime(2025, 5, 20),
+                    Detail1 = "เฉพาะลูกค้าที่มียอดสั่งซื้อเกิน 100,000 บาท"
+                }
+            ];
 
+            _logger.Information("Fetching mock JobBillCondition list: {@JobBillConditions}", Data);
+
+            return Data;
+        }
         public IEnumerable<TempProfile> GetTempProfileList()
         {
-            List<TempProfile> Data = 
+            List<TempProfile> Data =
             [
                 new TempProfile
                 {

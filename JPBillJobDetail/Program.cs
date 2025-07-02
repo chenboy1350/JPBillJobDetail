@@ -3,7 +3,11 @@ using JPBillJobDetail.Models;
 using JPBillJobDetail.Service.Implement;
 using JPBillJobDetail.Service.Interface;
 using Microsoft.EntityFrameworkCore;
+using QuestPDF.Drawing;
 using Serilog;
+
+FontManager.RegisterFont(File.OpenRead(@"wwwroot\fonts\Kanit\Kanit-Regular.ttf"));
+FontManager.RegisterFont(File.OpenRead(@"wwwroot\fonts\Kanit\Kanit-Bold.ttf"));
 
 var builder = WebApplication.CreateBuilder(args);
 

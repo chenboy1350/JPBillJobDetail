@@ -5,6 +5,7 @@
         public int JobNum { get; set; }
         public int Jobtype { get; set; }
         public int EmpCode { get; set; }
+        public string? BillCondition { get; set; }
         public DateTime? DtStart { get; set; }
         public DateTime? DtEnd { get; set; }
     }
