@@ -10,7 +10,7 @@
 <div class="card mb-4">
     <div class="card-header">
         <a class="btn btn-link text-decoration-none" data-bs-toggle="collapse" href="#searchPanel" role="button" aria-expanded="false" aria-controls="searchPanel">
-            <i class="fa-solid fa-filter"></i> ค้นหาบิล
+            <i class="fas fa-filter"></i> ค้นหาบิล
         </a>
     </div>
     <div class="collapse show" id="searchPanel">
@@ -84,11 +84,11 @@
                             </div>
                             <label>&nbsp;</label>
                             <button type="button" id="btnPrintPDF" class="btn btn-danger">
-                                <i class="fa-solid fa-file-pdf"></i> Print PDF
+                                <i class="fas fa-file-pdf"></i> Print PDF
                             </button>
                             <label>&nbsp;</label>
                             <button type="button" id="btnDownloadExcel" class="btn btn-success">
-                                <i class="fa-solid fa-file-excel"></i> Export Excel
+                                <i class="fas fa-file-excel"></i> Export Excel
                             </button>
                         </div>
                     </div>
@@ -105,7 +105,6 @@
 <div id="pagination-container">
     @await Html.PartialAsync("_PaginationPartial", Model)
 </div>
-
 
 @section Scripts {
     <script>
@@ -125,17 +124,20 @@
 
             $('#ddlJobGroup').select2({
                 placeholder: "-- เลือก ประเภทงาน --",
-                width: '100%'
+                width: '100%',
+                allowClear: true,
             });
 
             $('#ddlEmp').select2({
                 placeholder: "-- เลือก ช่าง --",
-                width: '100%'
+                width: '100%',
+                allowClear: true,
             });
 
             $('#ddlBillCondion').select2({
                 placeholder: "-- เลือก อาการ --",
-                width: '100%'
+                width: '100%',
+                allowClear: true,
             });
 
             $('#ddlJobGroup').on('change', function () {
@@ -264,7 +266,6 @@
             })();
         });
 
-
         function getTempProfile(){
             let ddlVal = $('#ddlJobGroup').val();
             if (ddlVal) {
@@ -327,7 +328,18 @@
                 },
                 success: function (response) {
                     if (response.success) {
+                        
                         $('#billjob-list').html(response.html);
+                        $('#tblBillJob').DataTable({
+                          paging: false,
+                          lengthChange: false,
+                          searching: false,
+                          ordering: true,
+                          autoWidth: false,
+                          responsive: true,
+                          info: false
+                        });
+
                         $('#pagination-container').html(response.pagination);
                         currentPage = response.currentPage;
                         $('#billjob-list').show();
@@ -349,14 +361,10 @@
             $('#searchForm')[0].reset();
             $('#dtStart').val(formattedToday);
             $('#dtEnd').val(formattedToday);
-            $('#ddlJobGroup').val('0').trigger('change');
-            $('#ddlBillCondion').val('0').trigger('change');
+            $('#ddlJobGroup').val(null).trigger('change');
+            $('#ddlBillCondion').val(null).trigger('change');
             $('#ddlEmp').empty().append($('<option>', { value: '', text: '-- เลือก ช่าง --' })).prop('disabled', true);
-            $('#tblBillJob tbody').empty().append(
-                $('<tr>').append(
-                    $('<td colspan="100%" class="text-center text-muted">').text('ไม่พบข้อมูล')
-                )
-            );
+            $('#searchForm').trigger('submit');
             $('#pagination-container').hide();
         }
     </script>
